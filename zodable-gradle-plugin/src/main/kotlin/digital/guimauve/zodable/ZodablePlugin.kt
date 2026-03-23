@@ -14,7 +14,7 @@ import java.io.File
 
 abstract class ZodablePlugin : Plugin<Project> {
 
-    private val zodableVersion = "1.7.2"
+    private val zodableVersion = "1.7.3"
 
     override fun apply(project: Project) {
         val outputPath = project.file("build/zodable")
@@ -138,7 +138,7 @@ abstract class ZodablePlugin : Plugin<Project> {
                     add(ExecCommand(listOf("npm", "pkg", "set", "main=src/index.js")))
                     add(ExecCommand(listOf("npm", "pkg", "set", "types=src/index.d.ts")))
                     add(ExecCommand(listOf("npm", "pkg", "set", "files[0]=src/**/*")))
-                    add(ExecCommand(listOf("npm", "install", "typescript", "--save-dev")))
+                    add(ExecCommand(listOf("npm", "install", "typescript@^5.0.0", "--save-dev")))
                     File(outputPath, "dependencies.txt").readLines().forEach { dep ->
                         val npmPackage = extension.externalPackageLocations.get()[dep] ?: dep
                         val installCommand =
