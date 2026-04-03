@@ -195,7 +195,7 @@ abstract class ZodablePlugin : Plugin<Project> {
             outputs.dir(pythonOutputPath.resolve("dist"))
             outputs.dir(pythonOutputPath.resolve(".venv"))
             outputs.file(pythonOutputPath.resolve("pyproject.toml"))
-            outputs.file(pythonOutputPath.resolve("$pythonSrcDir.egg-info"))
+            outputs.dir(pythonOutputPath.resolve("$pythonSrcDir.egg-info"))
 
             commandLine = listOf("python3", "-m", "venv", ".venv")
 
