@@ -6,13 +6,19 @@ import digital.guimauve.zodable.extensions.ZodableExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
+import org.gradle.process.ExecOperations
+import javax.inject.Inject
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.support.serviceOf
 import java.io.File
 
 abstract class ZodablePlugin : Plugin<Project> {
+
+    @get:Inject
+    abstract val execOperations: ExecOperations
 
     private val zodableVersion = "1.7.3"
 
@@ -163,7 +169,7 @@ abstract class ZodablePlugin : Plugin<Project> {
                     )
                     add(ExecCommand(listOf("npx", "tsc")))
                 }.forEach { command ->
-                    exec {
+                    execOperations.exec {
                         workingDir = outputPath
                         commandLine = command.commandLine
                         command.standardInput?.let {
@@ -212,7 +218,7 @@ abstract class ZodablePlugin : Plugin<Project> {
                     ExecCommand(listOf(pythonExec, "-m", "mypy", pythonSrcDir)),
                     ExecCommand(listOf(pythonExec, "-m", "build")),
                 ).forEach { command ->
-                    exec {
+                    execOperations.exec {
                         workingDir = pythonOutputPath
                         commandLine = command.commandLine
                     }
