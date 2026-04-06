@@ -17,17 +17,17 @@ kotlin {
     }
 }
 
-group = "digital.guimauve.zodable"
+group = "dev.zodable"
 version = "1.7.3"
 
 gradlePlugin {
-    website = "https://github.com/guimauvedigital/zodable"
-    vcsUrl = "https://github.com/guimauvedigital/zodable.git"
+    website = "https://github.com/zodable/zodable"
+    vcsUrl = "https://github.com/zodable/zodable.git"
 
     plugins {
         create("zodable-gradle-plugin") {
-            id = "digital.guimauve.zodable"
-            implementationClass = "digital.guimauve.zodable.ZodablePlugin"
+            id = "dev.zodable"
+            implementationClass = "dev.zodable.ZodablePlugin"
             displayName = "Zodable"
             description = "Generate zod schemas from Kotlin data classes."
             tags = listOf("zod", "ts", "ksp")

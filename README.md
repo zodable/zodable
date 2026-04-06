@@ -8,17 +8,8 @@ Add the following to your `build.gradle.kts`:
 
 ```kotlin
 plugins {
-    id("digital.guimauve.zodable") version "1.7.3"
-    id("com.google.devtools.ksp") version "2.2.20-2.0.4" // Adjust version as needed
-}
-```
-
-Or if you are using KSP 1:
-
-```kotlin
-plugins {
-    id("digital.guimauve.zodable") version "1.7.0-ksp1"
-    id("com.google.devtools.ksp") version "2.1.10-1.0.30"
+    id("dev.zodable") version "1.7.3"
+    id("com.google.devtools.ksp") version "2.3.4" // Adjust version as needed
 }
 ```
 
@@ -149,7 +140,7 @@ You can configure a few things in your `build.gradle.kts`:
 ```kotlin
 zodable {
     inferTypes = true // Generate `export type X = z.infer<typeof XSchema>`, default is true
-    optionals = digital.guimauve.zodable.Optionals.NULLISH // How to handle optional fields, default is NULLISH
+    optionals = dev.zodable.Optionals.NULLISH // How to handle optional fields, default is NULLISH
     packageName = "my-package" // npm package name, default is the gradle project name
     packageVersion = "1.0.0" // npm package version, default is the gradle project version
     // additional npm commands to be executed to affect the generated zodable package

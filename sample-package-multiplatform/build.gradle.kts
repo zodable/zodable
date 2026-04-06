@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    id("digital.guimauve.zodable")
+    id("dev.zodable")
     id("com.google.devtools.ksp")
 }
 

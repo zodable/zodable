@@ -7,16 +7,16 @@ plugins {
 }
 
 allprojects {
-    group = "digital.guimauve.zodable"
+    group = "dev.zodable"
     version = "1.7.3"
-    project.ext.set("url", "https://github.com/guimauvedigital/zodable")
+    project.ext.set("url", "https://github.com/zodable/zodable")
     project.ext.set("license.name", "Apache 2.0")
     project.ext.set("license.url", "https://www.apache.org/licenses/LICENSE-2.0.txt")
     project.ext.set("developer.id", "nathanfallet")
     project.ext.set("developer.name", "Nathan Fallet")
     project.ext.set("developer.email", "contact@nathanfallet.me")
     project.ext.set("developer.url", "https://www.nathanfallet.me")
-    project.ext.set("scm.url", "https://github.com/guimauvedigital/zodable.git")
+    project.ext.set("scm.url", "https://github.com/zodable/zodable.git")
 
     repositories {
         mavenCentral()
