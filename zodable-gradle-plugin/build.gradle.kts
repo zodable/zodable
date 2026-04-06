@@ -40,8 +40,8 @@ mavenPublishing {
     publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
     signAllPublications()
     pom {
-        name.set("zodable-ksp-processor")
-        description.set("KSP processor for Zodable Gradle plugin.")
+        name.set("zodable-gradle-plugin")
+        description.set("Generate zod schemas from Kotlin data classes.")
         url.set("https://github.com/zodable/zodable")
         licenses {
             license {
