@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("digital.guimauve.zodable")
+    id("dev.zodable")
     id("com.google.devtools.ksp")
 }
 
