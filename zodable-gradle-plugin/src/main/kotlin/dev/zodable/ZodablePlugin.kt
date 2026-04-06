@@ -18,7 +18,7 @@ abstract class ZodablePlugin : Plugin<Project> {
     @get:Inject
     abstract val execOperations: ExecOperations
 
-    private val zodableVersion = "1.7.3"
+    private val zodableVersion = "1.7.4"
 
     override fun apply(project: Project) {
         val outputPath = project.file("build/zodable")

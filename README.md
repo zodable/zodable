@@ -8,7 +8,7 @@ Add the following to your `build.gradle.kts`:
 
 ```kotlin
 plugins {
-    id("dev.zodable") version "1.7.3"
+    id("dev.zodable") version "1.7.4"
     id("com.google.devtools.ksp") version "2.3.4" // Adjust version as needed
 }
 ```
