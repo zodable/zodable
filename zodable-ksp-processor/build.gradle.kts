@@ -33,6 +33,10 @@ mavenPublishing {
     }
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 dependencies {
     api("com.google.devtools.ksp:symbol-processing-api:2.2.20-2.0.4")
     api(project(":zodable-annotations"))
