@@ -52,7 +52,7 @@ abstract class ZodableGenerator(
                 }
 
                 val generatedBody = overriddenSchema ?: if (sealedSubclasses.isNotEmpty()) {
-                    processSealedClass(name, arguments, sealedSubclasses, imports)
+                    processSealedClass(name, arguments, sealedSubclasses, imports).first
                 } else when (classDeclaration.classKind) {
                     ClassKind.ENUM_CLASS -> processEnumClass(name, arguments, classDeclaration)
                     else -> processClass(name, arguments, classDeclaration, imports)
@@ -91,35 +91,62 @@ abstract class ZodableGenerator(
         return generateEnumSchema(name, arguments, values)
     }
 
+    /**
+     * Recursively processes sealed class hierarchies.
+     * Returns a pair of (generated schema text, set of leaf schema names).
+     *
+     * The leaf names are used by the parent to build a flat discriminated union
+     * (required for Zod v3 type-safety, which only accepts ZodObject members in
+     * z.discriminatedUnion). Intermediate sealed classes still get their own union
+     * schemas emitted as useful standalone exports.
+     */
     private fun processSealedClass(
         name: String,
         arguments: List<String>,
         subclasses: List<KSClassDeclaration>,
         imports: MutableSet<Import>,
-    ): String {
-        val variants = subclasses.associate { subclass ->
-            // Get the SerialName annotation value to use as the discriminator value
+    ): Pair<String, Set<String>> {
+        val allSchemas = mutableListOf<String>()
+        val allLeafNames = mutableSetOf<String>()
+
+        for (subclass in subclasses) {
             val subclassName = subclass.simpleName.asString()
-            val serialName = subclass.annotations.firstNotNullOfOrNull { annotation ->
-                if (annotation.shortName.asString() != "SerialName") return@firstNotNullOfOrNull null
-                val args = annotation.arguments.associateBy { it.name?.asString() }
-                args["value"]?.value as? String
-            } ?: subclass.simpleName.asString()
             val subclassArguments = subclass.typeParameters.map { it.name.asString() }
-            val (literalType, literalImports) = resolveLiteralType(serialName)
-            imports.addAll(literalImports)
 
-            subclassName to processClass(
-                name = subclassName,
-                arguments = subclassArguments,
-                classDeclaration = subclass,
-                imports = imports,
-                additionalProperties = setOf("type" to literalType),
-            )
+            val nestedSealedSubclasses = try {
+                subclass.getSealedSubclasses().toList()
+            } catch (_: Exception) {
+                emptyList()
+            }
+
+            if (nestedSealedSubclasses.isNotEmpty()) {
+                val (nestedBody, nestedLeafNames) = processSealedClass(
+                    subclassName, subclassArguments, nestedSealedSubclasses, imports
+                )
+                allSchemas.add(nestedBody)
+                allLeafNames.addAll(nestedLeafNames)
+            } else {
+                // Get the SerialName annotation value to use as the discriminator value
+                val serialName = subclass.annotations.firstNotNullOfOrNull { annotation ->
+                    if (annotation.shortName.asString() != "SerialName") return@firstNotNullOfOrNull null
+                    val args = annotation.arguments.associateBy { it.name?.asString() }
+                    args["value"]?.value as? String
+                } ?: subclass.simpleName.asString()
+                val (literalType, literalImports) = resolveLiteralType(serialName)
+                imports.addAll(literalImports)
+                allSchemas.add(processClass(
+                    name = subclassName,
+                    arguments = subclassArguments,
+                    classDeclaration = subclass,
+                    imports = imports,
+                    additionalProperties = setOf("type" to literalType),
+                ))
+                allLeafNames.add(subclassName)
+            }
         }
-        val union = generateUnionSchema(name, arguments, variants.keys)
 
-        return variants.values.joinToString("\n\n") + "\n\n" + union
+        val union = generateUnionSchema(name, arguments, allLeafNames)
+        return (allSchemas.joinToString("\n\n") + "\n\n" + union) to allLeafNames
     }
 
     private fun processClass(
