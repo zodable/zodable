@@ -56,6 +56,78 @@ class User(BaseModel):
 
 Generated schemas can be found in `build/pydantable`. It is a ready to use pip package.
 
+## Sealed classes and discriminated unions
+
+Zodable supports sealed classes and interfaces, generating discriminated union schemas keyed on a `type` field. The discriminator value is taken from the `@SerialName` annotation, falling back to the class name.
+
+```kotlin
+@Serializable
+@Zodable
+sealed class Payload {
+    @SerialName("EMPTY")
+    data object EmptyPayload : Payload()
+
+    @SerialName("TEXT")
+    data class TextPayload(val text: String) : Payload()
+}
+```
+
+Generated TypeScript:
+
+```typescript
+export const EmptyPayloadSchema = z.object({
+    type: z.literal("EMPTY")
+})
+export const TextPayloadSchema = z.object({
+    text: z.string(),
+    type: z.literal("TEXT")
+})
+export const PayloadSchema = z.discriminatedUnion("type", [
+    EmptyPayloadSchema,
+    TextPayloadSchema
+])
+```
+
+### Nested sealed classes
+
+Nested sealed hierarchies are fully supported. Each intermediate sealed class gets its own discriminated union schema, which is useful for validating subsets of the hierarchy. The top-level union is flattened to include all concrete leaf types directly — this is required by Zod v3, whose `z.discriminatedUnion` only accepts `z.object` members.
+
+```kotlin
+@Serializable
+@Zodable
+sealed interface Notification {
+    sealed interface Push : Notification {
+        @SerialName("Apns") data class Apns(val token: String) : Push
+        @SerialName("Fcm")  data class Fcm(val token: String)  : Push
+    }
+    sealed interface Email : Notification {
+        @SerialName("Html") data class Html(val address: String) : Email
+        @SerialName("Text") data class Text(val address: String) : Email
+    }
+}
+```
+
+Generated TypeScript:
+
+```typescript
+// Leaf schemas
+export const ApnsSchema = z.object({ token: z.string(), type: z.literal("Apns") })
+export const FcmSchema  = z.object({ token: z.string(), type: z.literal("Fcm")  })
+
+// Intermediate union — useful when you only care about push notifications
+export const PushSchema = z.discriminatedUnion("type", [ApnsSchema, FcmSchema])
+
+export const HtmlSchema = z.object({ address: z.string(), type: z.literal("Html") })
+export const TextSchema = z.object({ address: z.string(), type: z.literal("Text") })
+
+export const EmailSchema = z.discriminatedUnion("type", [HtmlSchema, TextSchema])
+
+// Top-level union is flat (all concrete types) due to Zod v3 requirements
+export const NotificationSchema = z.discriminatedUnion("type", [
+    ApnsSchema, FcmSchema, HtmlSchema, TextSchema
+])
+```
+
 ## Customizing the generated schema with annotations
 
 You can customize the generated schema with annotations:
