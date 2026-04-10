@@ -8,7 +8,7 @@ Add the following to your `build.gradle.kts`:
 
 ```kotlin
 plugins {
-    id("dev.zodable") version "1.7.4"
+    id("dev.zodable") version "1.7.5"
     id("com.google.devtools.ksp") version "2.3.4" // Adjust version as needed
 }
 ```
@@ -58,7 +58,8 @@ Generated schemas can be found in `build/pydantable`. It is a ready to use pip p
 
 ## Sealed classes and discriminated unions
 
-Zodable supports sealed classes and interfaces, generating discriminated union schemas keyed on a `type` field. The discriminator value is taken from the `@SerialName` annotation, falling back to the class name.
+Zodable supports sealed classes and interfaces, generating discriminated union schemas keyed on a `type` field. The
+discriminator value is taken from the `@SerialName` annotation, falling back to the class name.
 
 ```kotlin
 @Serializable
@@ -90,19 +91,27 @@ export const PayloadSchema = z.discriminatedUnion("type", [
 
 ### Nested sealed classes
 
-Nested sealed hierarchies are fully supported. Each intermediate sealed class gets its own discriminated union schema, which is useful for validating subsets of the hierarchy. The top-level union is flattened to include all concrete leaf types directly — this is required by Zod v3, whose `z.discriminatedUnion` only accepts `z.object` members.
+Nested sealed hierarchies are fully supported. Each intermediate sealed class gets its own discriminated union schema,
+which is useful for validating subsets of the hierarchy. The top-level union is flattened to include all concrete leaf
+types directly — this is required by Zod v3, whose `z.discriminatedUnion` only accepts `z.object` members.
 
 ```kotlin
 @Serializable
 @Zodable
 sealed interface Notification {
     sealed interface Push : Notification {
-        @SerialName("Apns") data class Apns(val token: String) : Push
-        @SerialName("Fcm")  data class Fcm(val token: String)  : Push
+        @SerialName("Apns")
+        data class Apns(val token: String) : Push
+
+        @SerialName("Fcm")
+        data class Fcm(val token: String) : Push
     }
     sealed interface Email : Notification {
-        @SerialName("Html") data class Html(val address: String) : Email
-        @SerialName("Text") data class Text(val address: String) : Email
+        @SerialName("Html")
+        data class Html(val address: String) : Email
+
+        @SerialName("Text")
+        data class Text(val address: String) : Email
     }
 }
 ```
